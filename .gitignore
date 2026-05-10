@@ -1,0 +1,15 @@
+# MoneyForwardのCSV（個人の取引データ）
+mf_csv/
+
+# Excelファイル（個人の株・サブスク情報）
+*.xlsx
+
+# Node.js
+node_modules/
+
+# 自動生成ファイル（data_inline.jsは含める）
+data.json
+
+# Windows
+Thumbs.db
+Desktop.ini

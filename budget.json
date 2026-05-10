@@ -1,0 +1,63 @@
+{
+  "month": "2026-05",
+  "variable_categories": [
+    { "name": "食費",           "budget": 40000 },
+    { "name": "日用品",         "budget": 10000 },
+    { "name": "美容",           "budget": 12000 },
+    { "name": "交通費",         "budget": 5000  },
+    { "name": "趣味・自己投資", "budget": 30000 },
+    { "name": "医療費",         "budget": 10000 },
+    { "name": "外食・カフェ",   "budget": 10000 },
+    { "name": "その他",         "budget": 10000 },
+    { "name": "転職活動費",     "budget": 5000  },
+    { "name": "婚活費用",       "budget": 20000 }
+  ],
+  "fixed_costs": [
+    { "name": "家賃",     "amount": 53000 },
+    { "name": "光熱費",   "amount": 11978 },
+    { "name": "通信費",   "amount": 4913  },
+    { "name": "ジム",     "amount": 11000 },
+    { "name": "サブスク", "amount": 11788 }
+  ],
+  "dividends": {
+    "monthly_total": 14423,
+    "annual_total": 173072,
+    "note": "四半期ごとに証券口座の配当実績で更新してください。stocks.xlsxがあれば自動読み込みされます。"
+  },
+  "income_monthly": 391829,
+  "investment_monthly": 10000,
+  "investment_principal": 3800000,
+  "salary_growth_rate": 3.0,
+  "subscriptions_detail": [
+    { "name": "DMM TV",                    "amount": 550,  "note": "動画" },
+    { "name": "MindMap",                   "amount": 950,  "note": "ツール" },
+    { "name": "1password（3年版）",        "amount": 206,  "note": "セキュリティ・年払い月換算" },
+    { "name": "adobe XD",                  "amount": 1300, "note": "デザイン" },
+    { "name": "リベシティ",                "amount": 3000, "note": "コミュニティ" },
+    { "name": "Amazonサプリ",              "amount": 2830, "note": "定期購入" },
+    { "name": "サンドラサプリ",            "amount": 660,  "note": "定期購入" },
+    { "name": "マネーフォワードクラウド",  "amount": 900,  "note": "家計管理・年払い月換算" },
+    { "name": "xサーバー",                "amount": 1392, "note": "Web・年払い月換算（2027年2月まで）" }
+  ],
+  "subscriptions_note": "ジム(¥11,000)は固定費に計上済み。subscriptions.xlsxがあれば自動で最新verタブを読み込みます。",
+  "mf_category_map": {
+    "食費": "食費",
+    "日用品・生活用品": "日用品",
+    "コスメ・美容": "美容",
+    "衣服・美容": "美容",
+    "交通費": "交通費",
+    "趣味・娯楽": "趣味・自己投資",
+    "自己啓発": "趣味・自己投資",
+    "医療・薬": "医療費",
+    "外食": "外食・カフェ",
+    "カフェ": "外食・カフェ",
+    "転職・就職": "転職活動費",
+    "婚活・結婚": "婚活費用",
+    "家賃・住宅": "固定費",
+    "水道・光熱費": "固定費",
+    "通信費": "固定費",
+    "その他": "その他",
+    "特別な支出": "その他",
+    "現金・カード": "その他"
+  }
+}
