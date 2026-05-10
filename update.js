@@ -90,6 +90,23 @@ async function main() {
     console.log('⚠ stocks.xlsx が見つかりましたが exceljs がありません。budget.jsonの値を使用します。');
   }
 
+  // ===== 2c. Check for mf_dashboard_input.json (Claude自動生成JSON) =====
+  const jsonInputPath = path.join(DIR, 'mf_dashboard_input.json');
+  let jsonInput = null;
+  if (fs.existsSync(jsonInputPath)) {
+    try {
+      const parsed = JSON.parse(fs.readFileSync(jsonInputPath, 'utf8'));
+      if (parsed.month !== budget.month) {
+        console.log('⚠ mf_dashboard_input.json の月(' + parsed.month + ')が budget.json の月(' + budget.month + ')と一致しません。無視します。');
+      } else {
+        jsonInput = parsed;
+        console.log('✅ mf_dashboard_input.json を使用します (月: ' + jsonInput.month + ')');
+      }
+    } catch (e) {
+      console.log('⚠ mf_dashboard_input.json の読み込みに失敗しました: ' + e.message);
+    }
+  }
+
   // ===== 3. Find newest CSV in mf_csv/ =====
   if (!fs.existsSync(MF_DIR)) {
     fs.mkdirSync(MF_DIR, { recursive: true });
@@ -101,16 +118,29 @@ async function main() {
     .map(f => ({ name: f, mtime: fs.statSync(path.join(MF_DIR, f)).mtimeMs }))
     .sort((a, b) => b.mtime - a.mtime);
 
-  // ===== 4. Parse CSV (if available) =====
+  // ===== 4. Parse CSV or use JSON input =====
   let transactions = [];
   let csvSource    = '（CSVなし）';
   let datePeriod   = { from: budget.month + '-01', to: new Date().toISOString().slice(0,10) };
   const unmappedSet = new Set();
 
-  if (csvFiles.length === 0) {
+  // ===== 5. Aggregate spending by category =====
+  const spendingMap = {};
+  budget.variable_categories.forEach(c => { spendingMap[c.name] = 0; });
+
+  if (jsonInput) {
+    // --- JSON入力モード（Claude自動生成） ---
+    csvSource = 'mf_dashboard_input.json (Claude自動取得)';
+    if (jsonInput.data_period) datePeriod = jsonInput.data_period;
+    jsonInput.variable_spending.forEach(item => {
+      if (spendingMap[item.name] !== undefined) spendingMap[item.name] = item.actual || 0;
+    });
+    console.log('📊 JSONデータを使用: ' + jsonInput.variable_spending.length + ' カテゴリ');
+  } else if (csvFiles.length === 0) {
     console.log('⚠ mf_csv フォルダにCSVファイルがありません。ゼロ実績でdata.jsonを生成します。');
     console.log('  → MoneyForwardからCSVをダウンロードして mf_csv/ フォルダに入れてください。');
   } else {
+    // --- CSVモード（従来通り） ---
     if (csvFiles.length > 1) {
       console.log('ℹ 複数のCSVが見つかりました。最新のファイルを使用します:');
       csvFiles.forEach((f, i) => console.log('   ' + (i === 0 ? '▶' : ' ') + ' ' + f.name));
@@ -165,18 +195,15 @@ async function main() {
       dates.sort();
       datePeriod = { from: dates[0].replace(/\//g, '-'), to: dates[dates.length - 1].replace(/\//g, '-') };
     }
+
+    transactions.forEach(t => {
+      if (spendingMap[t.category] !== undefined) spendingMap[t.category] += t.amount;
+      else spendingMap['その他'] = (spendingMap['その他'] || 0) + t.amount;
+    });
   }
 
-  // ===== 5. Aggregate spending by category =====
-  const spendingMap = {};
-  budget.variable_categories.forEach(c => { spendingMap[c.name] = 0; });
-
-  transactions.forEach(t => {
-    if (spendingMap[t.category] !== undefined) spendingMap[t.category] += t.amount;
-    else spendingMap['その他'] = (spendingMap['その他'] || 0) + t.amount;
-  });
-
   // ===== 6. Build variable_spending with traffic lights =====
+
   const variable_spending = budget.variable_categories.map(c => {
     const actual = Math.round(spendingMap[c.name] || 0);
     const pct    = c.budget > 0 ? (actual / c.budget) * 100 : 0;

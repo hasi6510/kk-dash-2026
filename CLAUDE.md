@@ -150,7 +150,66 @@ Googleスプレッドシートのサブスクシートを更新してから：
 
 ---
 
-## 家計ダッシュボードのCSV更新手順
+## 家計ダッシュボードを自動更新するとき
+
+たっくーさんから「今月のダッシュボードを更新して」と依頼されたら**必ず以下を実行すること**：
+
+### 手順
+
+1. Chrome MCP で `https://moneyforward.com/cf/summary?month=YYYY-MM` を開く（YYY-MMは今月）
+2. 各カテゴリの支出金額を読み取る
+3. 以下のマッピングで `mf_dashboard_input.json` を作成する
+
+```json
+{
+  "month": "YYYY-MM",
+  "created_at": "<ISO timestamp>",
+  "data_period": { "from": "YYYY-MM-01", "to": "YYYY-MM-DD" },
+  "variable_spending": [
+    { "name": "食費",           "actual": 000000 },
+    { "name": "日用品",         "actual": 000000 },
+    { "name": "美容",           "actual": 000000 },
+    { "name": "交通費",         "actual": 000000 },
+    { "name": "趣味・自己投資", "actual": 000000 },
+    { "name": "医療費",         "actual": 000000 },
+    { "name": "外食・カフェ",   "actual": 000000 },
+    { "name": "その他",         "actual": 000000 },
+    { "name": "転職活動費",     "actual": 000000 },
+    { "name": "婚活費用",       "actual": 000000 }
+  ]
+}
+```
+
+| MoneyForward カテゴリ | ダッシュボード |
+|----------------------|--------------|
+| 食費 | 食費 |
+| 日用品・生活用品 | 日用品 |
+| コスメ・美容 / 衣服・美容 | 美容 |
+| 交通費 | 交通費 |
+| 趣味・娯楽 / 自己啓発 | 趣味・自己投資 |
+| 医療・薬 | 医療費 |
+| 外食 / カフェ | 外食・カフェ |
+| 転職・就職 | 転職活動費 |
+| 婚活・結婚 | 婚活費用 |
+| その他 / 上記以外 | その他 |
+
+4. `mf_dashboard_input.json` を `C:\Users\ausbr\Desktop\Claude\Budget-Dashboard\` に保存
+5. Bash で以下を実行：
+   ```
+   cd "C:\Users\ausbr\Desktop\Claude\Budget-Dashboard"
+   node update.js
+   git add data_inline.js mf_dashboard_input.json
+   git commit -m "update: YYYY-MM のデータを更新"
+   git push origin main
+   ```
+6. たっくーさんへ伝えること：
+   > ダッシュボードを更新しました！  
+   > スマホで確認してみてください📊  
+   > https://hasi6510.github.io/kk-dash-2026/
+
+---
+
+## 家計ダッシュボードのCSV更新手順（手動版）
 
 毎月 MoneyForward ME からCSVをダウンロードしてダッシュボードを更新するとき：
 
