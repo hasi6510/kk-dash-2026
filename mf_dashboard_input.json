@@ -1,0 +1,17 @@
+{
+  "month": "2026-05",
+  "created_at": "2026-05-10T17:15:00+09:00",
+  "data_period": { "from": "2026-05-01", "to": "2026-05-10" },
+  "variable_spending": [
+    { "name": "食費",           "actual": 0 },
+    { "name": "日用品",         "actual": 0 },
+    { "name": "美容",           "actual": 0 },
+    { "name": "交通費",         "actual": 0 },
+    { "name": "趣味・自己投資", "actual": 0 },
+    { "name": "医療費",         "actual": 0 },
+    { "name": "外食・カフェ",   "actual": 0 },
+    { "name": "その他",         "actual": 0 },
+    { "name": "転職活動費",     "actual": 0 },
+    { "name": "婚活費用",       "actual": 0 }
+  ]
+}
