@@ -1,5 +1,5 @@
 {
-  "month": "2026-05",
+  "month": "2026-06",
   "variable_categories": [
     { "name": "食費",           "budget": 40000 },
     { "name": "日用品",         "budget": 10000 },
@@ -10,7 +10,7 @@
     { "name": "外食・カフェ",   "budget": 10000 },
     { "name": "その他",         "budget": 10000 },
     { "name": "転職活動費",     "budget": 5000  },
-    { "name": "婚活費用",       "budget": 20000 }
+    { "name": "婚活費用",       "budget": 25000 }
   ],
   "fixed_costs": [
     { "name": "家賃",     "amount": 53000 },
