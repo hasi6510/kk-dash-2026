@@ -564,6 +564,106 @@ main { padding: 20px; max-width: 1200px; margin: 0 auto; }
   .cards-grid { grid-template-columns: 1fr; }
   .summary-bar { grid-template-columns: 1fr; }
 }
+
+/* ===== 4分類グリッド ===== */
+.quadrant-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+@media (max-width: 520px) {
+  .quadrant-grid { grid-template-columns: 1fr; }
+}
+.quadrant {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 3px solid;
+  border-radius: var(--radius);
+  padding: 14px;
+}
+.quadrant-fixed     { border-top-color: #3498db; }
+.quadrant-variable  { border-top-color: #e94560; }
+.quadrant-irregular { border-top-color: #9b59b6; }
+.quadrant-special   { border-top-color: #f39c12; }
+
+.quadrant-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.quadrant-title    { font-size: 0.9rem; font-weight: 700; color: var(--text); }
+.quadrant-subtitle { font-size: 0.68rem; color: var(--text-muted); margin-left: auto; }
+
+.quadrant-total {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: right;
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+}
+.quadrant-progress-line {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: right;
+  margin-bottom: 6px;
+}
+
+/* ミニ行（各クアドラント内のカテゴリ） */
+.mini-row { padding: 6px 0; border-bottom: 1px solid var(--border); }
+.mini-row:last-child { border-bottom: none; }
+.mini-row-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3px;
+}
+.mini-name { font-size: 0.80rem; color: var(--text); }
+.mini-pct  { font-size: 0.72rem; font-weight: 700; }
+.mini-pct.green  { color: var(--green); }
+.mini-pct.yellow { color: var(--yellow); }
+.mini-pct.red    { color: var(--red); }
+.mini-bar-track {
+  height: 3px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 3px;
+}
+.mini-bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s; }
+.mini-bar-fill.green  { background: var(--green); }
+.mini-bar-fill.yellow { background: var(--yellow); }
+.mini-bar-fill.red    { background: var(--red); }
+.mini-amounts {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.70rem;
+  color: var(--text-muted);
+}
+.mini-actual { color: var(--text); }
+
+/* 固定費ミニ行 */
+.fixed-mini-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.80rem;
+}
+.fixed-mini-row:last-child { border-bottom: none; }
+.fixed-mini-name { color: var(--text-muted); }
+.fixed-mini-amt  { color: var(--text); font-weight: 500; }
+
+/* 特別費空欄 */
+.quadrant-empty { text-align: center; padding: 28px 8px; }
+.quadrant-empty-icon { font-size: 2rem; margin-bottom: 8px; opacity: 0.4; }
+.quadrant-empty-text { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 4px; }
+.quadrant-empty-hint { font-size: 0.70rem; color: var(--text-muted); opacity: 0.55; }
 </style>
 </head>
 <body>
@@ -580,88 +680,76 @@ main { padding: 20px; max-width: 1200px; margin: 0 auto; }
 </header>
 
 <div class="tabs">
-  <div class="tab active" onclick="switchTab('summary')">📊 変動費</div>
-  <div class="tab" onclick="switchTab('irregular')">📅 不定期費</div>
-  <div class="tab" onclick="switchTab('fixed')">💳 固定費</div>
+  <div class="tab active" onclick="switchTab('summary')">🏠 ホーム</div>
   <div class="tab" onclick="switchTab('dividend')">💰 配当カバレッジ</div>
   <div class="tab" onclick="switchTab('review')">📋 振り返り</div>
 </div>
 
 <main>
 
-  <!-- ===== TAB: 変動費 ===== -->
+  <!-- ===== TAB: ホーム（4分類グリッド） ===== -->
   <div class="section active" id="tab-summary">
 
     <div class="alert-banner" id="over-budget-alert"></div>
 
-    <!-- Summary figures -->
+    <!-- Summary bar -->
     <div class="summary-bar" id="summary-bar"></div>
 
-    <!-- Overall variable spending progress bar -->
-    <div class="overall-bar-wrap">
-      <div class="overall-bar-label">
-        <span>変動費の使用状況</span>
-        <span id="overall-pct-label">0%</span>
-      </div>
-      <div class="bar-track">
-        <div class="bar-fill green" id="overall-bar" style="width:0%"></div>
-      </div>
-    </div>
+    <!-- 2×2 Quadrant Grid -->
+    <div class="quadrant-grid">
 
-    <!-- Category cards -->
-    <div class="section-title">変動費 カテゴリ別 予算 vs 実績</div>
-    <div class="cards-grid" id="cards-grid"></div>
-
-    <!-- Chart -->
-    <div class="chart-wrap">
-      <div class="chart-title">予算 vs 実績 比較グラフ</div>
-      <div class="chart-container">
-        <canvas id="budget-chart"></canvas>
+      <!-- 固定費 -->
+      <div class="quadrant quadrant-fixed">
+        <div class="quadrant-header">
+          <span>💳</span>
+          <span class="quadrant-title">固定費</span>
+          <span class="quadrant-subtitle">毎月一定</span>
+        </div>
+        <div id="qd-fixed-list"></div>
+        <div class="quadrant-total" id="qd-fixed-total"></div>
       </div>
+
+      <!-- 変動費 -->
+      <div class="quadrant quadrant-variable">
+        <div class="quadrant-header">
+          <span>📊</span>
+          <span class="quadrant-title">変動費</span>
+          <span class="quadrant-subtitle">毎月変動</span>
+        </div>
+        <div class="quadrant-progress-line" id="qd-variable-progress"></div>
+        <div id="qd-variable-list"></div>
+      </div>
+
+      <!-- 不定期費 -->
+      <div class="quadrant quadrant-irregular">
+        <div class="quadrant-header">
+          <span>📅</span>
+          <span class="quadrant-title">不定期費</span>
+          <span class="quadrant-subtitle">不定期発生</span>
+        </div>
+        <div class="quadrant-progress-line" id="qd-irregular-progress"></div>
+        <div id="qd-irregular-list"></div>
+      </div>
+
+      <!-- 特別費 -->
+      <div class="quadrant quadrant-special">
+        <div class="quadrant-header">
+          <span>⭐</span>
+          <span class="quadrant-title">特別費</span>
+          <span class="quadrant-subtitle">大型出費</span>
+        </div>
+        <div class="quadrant-empty">
+          <div class="quadrant-empty-icon">✨</div>
+          <div class="quadrant-empty-text">今月の特別な出費はありません</div>
+          <div class="quadrant-empty-hint">家電・旅行・冠婚葬祭など</div>
+        </div>
+      </div>
+
     </div>
 
     <!-- Info box -->
     <div class="info-banner" id="csv-info"></div>
 
-  </div>
-
-  <!-- ===== TAB: 不定期費 ===== -->
-  <div class="section" id="tab-irregular">
-
-    <div class="alert-banner" id="irregular-over-budget-alert"></div>
-
-    <!-- Overall irregular spending progress bar -->
-    <div class="overall-bar-wrap">
-      <div class="overall-bar-label">
-        <span>不定期費の使用状況</span>
-        <span id="irregular-overall-pct-label">0%</span>
-      </div>
-      <div class="bar-track">
-        <div class="bar-fill green" id="irregular-overall-bar" style="width:0%"></div>
-      </div>
-    </div>
-
-    <!-- Category cards -->
-    <div class="section-title">不定期費 カテゴリ別 予算 vs 実績</div>
-    <div class="cards-grid" id="irregular-cards-grid"></div>
-
-  </div>
-
-  <!-- ===== TAB: 固定費 ===== -->
-  <div class="section" id="tab-fixed">
-    <div class="section-title">今月の固定費</div>
-    <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:16px;">
-      <table class="fixed-table">
-        <thead>
-          <tr>
-            <th>費目</th>
-            <th style="text-align:right;">金額（月）</th>
-          </tr>
-        </thead>
-        <tbody id="fixed-tbody"></tbody>
-      </table>
-    </div>
-    <div class="fixed-note" id="fixed-note"></div>
   </div>
 
   <!-- ===== TAB: 振り返り ===== -->
@@ -754,11 +842,10 @@ const D = typeof BUDGET_DATA !== 'undefined' ? BUDGET_DATA : null;
 
 // ===== TABS =====
 function switchTab(name) {
-  const names = ['summary','fixed','dividend','review'];
+  const names = ['summary','dividend','review'];
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i] === name));
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
-  if (name === 'summary' && window._chart) window._chart.resize();
 }
 
 // ===== HELPERS =====
@@ -788,12 +875,8 @@ function renderAll() {
   }
 
   renderSummaryBar();
-  renderOverallBar();
-  renderCards();
-  renderChart();
+  renderQuadrantGrid();
   renderCSVInfo();
-  renderIrregularCards();
-  renderFixed();
   renderDividend();
   renderAlerts();
   renderReview();
@@ -863,6 +946,60 @@ function renderCards() {
       </div>
     `;
   }).join('');
+}
+
+function renderQuadrantGrid() {
+  // 固定費
+  const fixedList  = document.getElementById('qd-fixed-list');
+  const fixedTotal = document.getElementById('qd-fixed-total');
+  if (fixedList) {
+    fixedList.innerHTML = (D.fixed_costs || []).map(fc => `
+      <div class="fixed-mini-row">
+        <span class="fixed-mini-name">${fc.name}</span>
+        <span class="fixed-mini-amt">${yen(fc.amount)}</span>
+      </div>
+    `).join('');
+  }
+  if (fixedTotal) fixedTotal.textContent = '合計 ' + yen(D.fixed_total);
+
+  // 変動費
+  const vList = document.getElementById('qd-variable-list');
+  const vProg = document.getElementById('qd-variable-progress');
+  if (vProg) {
+    const vpct = D.variable_budget_total > 0
+      ? Math.round((D.variable_actual_total / D.variable_budget_total) * 100) : 0;
+    vProg.textContent = yen(D.variable_actual_total) + ' / ' + yen(D.variable_budget_total) + '（' + vpct + '%）';
+  }
+  if (vList) vList.innerHTML = renderMiniRows(D.variable_spending || []);
+
+  // 不定期費
+  const iList = document.getElementById('qd-irregular-list');
+  const iProg = document.getElementById('qd-irregular-progress');
+  const ib = D.irregular_budget_total || 0;
+  const ia = D.irregular_actual_total || 0;
+  if (iProg) {
+    const ipct = ib > 0 ? Math.round((ia / ib) * 100) : 0;
+    iProg.textContent = yen(ia) + ' / ' + yen(ib) + '（' + ipct + '%）';
+  }
+  if (iList) iList.innerHTML = renderMiniRows(D.irregular_spending || []);
+}
+
+function renderMiniRows(items) {
+  return items.map(c => `
+    <div class="mini-row">
+      <div class="mini-row-top">
+        <span class="mini-name">${c.name}</span>
+        <span class="mini-pct ${c.traffic_light}">${c.pct}%</span>
+      </div>
+      <div class="mini-bar-track">
+        <div class="mini-bar-fill ${c.traffic_light}" style="width:${Math.min(c.pct,100)}%"></div>
+      </div>
+      <div class="mini-amounts">
+        <span class="mini-actual">${yen(c.actual)}</span>
+        <span>${yen(c.budget)}</span>
+      </div>
+    </div>
+  `).join('');
 }
 
 function renderIrregularCards() {
