@@ -580,7 +580,8 @@ main { padding: 20px; max-width: 1200px; margin: 0 auto; }
 </header>
 
 <div class="tabs">
-  <div class="tab active" onclick="switchTab('summary')">📊 支出サマリー</div>
+  <div class="tab active" onclick="switchTab('summary')">📊 変動費</div>
+  <div class="tab" onclick="switchTab('irregular')">📅 不定期費</div>
   <div class="tab" onclick="switchTab('fixed')">💳 固定費</div>
   <div class="tab" onclick="switchTab('dividend')">💰 配当カバレッジ</div>
   <div class="tab" onclick="switchTab('review')">📋 振り返り</div>
@@ -588,7 +589,7 @@ main { padding: 20px; max-width: 1200px; margin: 0 auto; }
 
 <main>
 
-  <!-- ===== TAB: 支出サマリー ===== -->
+  <!-- ===== TAB: 変動費 ===== -->
   <div class="section active" id="tab-summary">
 
     <div class="alert-banner" id="over-budget-alert"></div>
@@ -608,7 +609,7 @@ main { padding: 20px; max-width: 1200px; margin: 0 auto; }
     </div>
 
     <!-- Category cards -->
-    <div class="section-title">カテゴリ別 予算 vs 実績</div>
+    <div class="section-title">変動費 カテゴリ別 予算 vs 実績</div>
     <div class="cards-grid" id="cards-grid"></div>
 
     <!-- Chart -->
@@ -621,6 +622,28 @@ main { padding: 20px; max-width: 1200px; margin: 0 auto; }
 
     <!-- Info box -->
     <div class="info-banner" id="csv-info"></div>
+
+  </div>
+
+  <!-- ===== TAB: 不定期費 ===== -->
+  <div class="section" id="tab-irregular">
+
+    <div class="alert-banner" id="irregular-over-budget-alert"></div>
+
+    <!-- Overall irregular spending progress bar -->
+    <div class="overall-bar-wrap">
+      <div class="overall-bar-label">
+        <span>不定期費の使用状況</span>
+        <span id="irregular-overall-pct-label">0%</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill green" id="irregular-overall-bar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- Category cards -->
+    <div class="section-title">不定期費 カテゴリ別 予算 vs 実績</div>
+    <div class="cards-grid" id="irregular-cards-grid"></div>
 
   </div>
 
@@ -769,6 +792,7 @@ function renderAll() {
   renderCards();
   renderChart();
   renderCSVInfo();
+  renderIrregularCards();
   renderFixed();
   renderDividend();
   renderAlerts();
@@ -782,11 +806,13 @@ function renderSummaryBar() {
   const ga = D.grand_actual;
   const gb = D.grand_budget;
 
+  const ib = D.irregular_budget_total || 0;
+  const ia = D.irregular_actual_total || 0;
   const items = [
     { label: '変動費 実績', value: yen(va), sub: '予算 ' + yen(vb) },
+    { label: '不定期費 実績', value: yen(ia), sub: '予算 ' + yen(ib) },
     { label: '固定費 合計', value: yen(ft), sub: '毎月一定' },
-    { label: '今月支出 合計', value: yen(ga), sub: '予算 ' + yen(gb), accent: true },
-    { label: '変動費 残り', value: yen(Math.max(0, vb - va)), sub: '変動費枠のみ' }
+    { label: '今月支出 合計', value: yen(ga), sub: '予算 ' + yen(gb), accent: true }
   ];
 
   document.getElementById('summary-bar').innerHTML = items.map(i => `
@@ -837,6 +863,58 @@ function renderCards() {
       </div>
     `;
   }).join('');
+}
+
+function renderIrregularCards() {
+  const grid = document.getElementById('irregular-cards-grid');
+  if (!grid) return;
+  const items = D.irregular_spending || [];
+  grid.innerHTML = items.map(c => {
+    const pct = c.pct;
+    const cls = c.traffic_light;
+    const remaining = c.budget - c.actual;
+    return `
+      <div class="budget-card ${cls}">
+        <div class="card-top">
+          <div class="card-category">${c.name}</div>
+          <div class="card-light">${trafficEmoji(cls)}</div>
+        </div>
+        <div class="card-amounts">
+          <span class="card-actual">${yen(c.actual)}</span>
+          <span class="card-sep"> / </span>
+          <span class="card-budget">${yen(c.budget)}</span>
+        </div>
+        <div class="card-bar-track">
+          <div class="card-bar-fill" style="width:${Math.min(pct,100)}%"></div>
+        </div>
+        <div class="card-footer">
+          <span class="card-remaining">${remaining >= 0 ? '残り ' + yen(remaining) : '超過 ' + yen(-remaining)}</span>
+          <span class="card-pct">${pctStr(pct)}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Overall irregular progress bar
+  const ib = D.irregular_budget_total || 0;
+  const ia = D.irregular_actual_total || 0;
+  const ipct = ib > 0 ? Math.min((ia / ib) * 100, 100) : 0;
+  const ibar = document.getElementById('irregular-overall-bar');
+  const ilabel = document.getElementById('irregular-overall-pct-label');
+  if (ibar) {
+    ibar.style.width = ipct + '%';
+    ibar.className = 'bar-fill ' + (ipct < 70 ? 'green' : ipct < 100 ? 'yellow' : 'red');
+  }
+  if (ilabel) ilabel.textContent = Math.round(ipct) + '%';
+
+  // Alert for over-budget
+  const alert = document.getElementById('irregular-over-budget-alert');
+  if (alert) {
+    const overItems = items.filter(c => c.traffic_light === 'red');
+    alert.textContent = overItems.length > 0
+      ? '⚠️ 予算超過: ' + overItems.map(c => c.name).join('・')
+      : '';
+  }
 }
 
 function renderChart() {

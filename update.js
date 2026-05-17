@@ -202,21 +202,26 @@ async function main() {
     });
   }
 
-  // ===== 6. Build variable_spending with traffic lights =====
+  // ===== 6. Build spending arrays with traffic lights (split by type) =====
 
-  const variable_spending = budget.variable_categories.map(c => {
+  const all_spending = budget.variable_categories.map(c => {
     const actual = Math.round(spendingMap[c.name] || 0);
     const pct    = c.budget > 0 ? (actual / c.budget) * 100 : 0;
     const light  = pct < 70 ? 'green' : pct < 100 ? 'yellow' : 'red';
-    return { name: c.name, budget: c.budget, actual, pct: Math.round(pct * 10) / 10, traffic_light: light };
+    return { name: c.name, budget: c.budget, actual, pct: Math.round(pct * 10) / 10, traffic_light: light, type: c.type || '変動費' };
   });
 
+  const variable_spending  = all_spending.filter(c => c.type === '変動費');
+  const irregular_spending = all_spending.filter(c => c.type === '不定期費');
+
   // ===== 7. Totals =====
-  const fixed_total           = budget.fixed_costs.reduce((s, fc) => s + fc.amount, 0);
-  const variable_budget_total = budget.variable_categories.reduce((s, c) => s + c.budget, 0);
-  const variable_actual_total = variable_spending.reduce((s, c) => s + c.actual, 0);
-  const grand_budget          = fixed_total + variable_budget_total;
-  const grand_actual          = fixed_total + variable_actual_total;
+  const fixed_total             = budget.fixed_costs.reduce((s, fc) => s + fc.amount, 0);
+  const variable_budget_total   = variable_spending.reduce((s, c) => s + c.budget, 0);
+  const variable_actual_total   = variable_spending.reduce((s, c) => s + c.actual, 0);
+  const irregular_budget_total  = irregular_spending.reduce((s, c) => s + c.budget, 0);
+  const irregular_actual_total  = irregular_spending.reduce((s, c) => s + c.actual, 0);
+  const grand_budget            = fixed_total + variable_budget_total + irregular_budget_total;
+  const grand_actual            = fixed_total + variable_actual_total + irregular_actual_total;
 
   // ===== 8. Dividend data (from xlsx override or budget.json) =====
   const annual_div  = dividendOverride ? dividendOverride.annual_total  : budget.dividends.annual_total;
@@ -243,7 +248,7 @@ async function main() {
   const investment_ratio_pct = income_monthly > 0
     ? Math.round((inv_monthly / income_monthly) * 1000) / 10
     : 0;
-  const investment_surplus = income_monthly - fixed_total - variable_actual_total - inv_monthly;
+  const investment_surplus = income_monthly - fixed_total - variable_actual_total - irregular_actual_total - inv_monthly;
 
   // ===== 12. Highlights（今月良かったこと） =====
   const highlights = [];
@@ -295,10 +300,13 @@ async function main() {
     data_period: datePeriod,
     csv_source: csvSource,
     variable_spending,
+    irregular_spending,
     fixed_costs: budget.fixed_costs,
     fixed_total,
     variable_budget_total,
     variable_actual_total,
+    irregular_budget_total,
+    irregular_actual_total,
     grand_budget,
     grand_actual,
     dividends: {

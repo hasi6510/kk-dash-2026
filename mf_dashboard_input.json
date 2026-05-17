@@ -10,8 +10,10 @@
     { "name": "趣味・自己投資", "actual": 37341 },
     { "name": "医療費",         "actual": 2310  },
     { "name": "外食・カフェ",   "actual": 0     },
-    { "name": "その他",         "actual": 16100 },
+    { "name": "婚活費用",       "actual": 0     },
+    { "name": "被服費",         "actual": 0     },
+    { "name": "ふるさと納税",   "actual": 0     },
     { "name": "転職活動費",     "actual": 0     },
-    { "name": "婚活費用",       "actual": 0     }
+    { "name": "その他",         "actual": 16100 }
   ]
 }
