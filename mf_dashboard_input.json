@@ -12,6 +12,8 @@
     { "name": "婚活費用",       "actual": 0     },
     { "name": "被服費",         "actual": 0     },
     { "name": "ふるさと納税",   "actual": 0     },
+    { "name": "家賃更新料",     "actual": 53000 },
+    { "name": "サーバー代",     "actual": 1392  },
     { "name": "転職活動費",     "actual": 0     },
     { "name": "その他",         "actual": 16100 }
   ]
