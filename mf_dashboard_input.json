@@ -1,19 +1,19 @@
 {
-  "month": "2026-05",
-  "created_at": "2026-05-30T00:00:00+09:00",
-  "data_period": { "from": "2026-05-01", "to": "2026-05-31" },
+  "month": "2026-06",
+  "created_at": "2026-06-01T00:00:00+09:00",
+  "data_period": { "from": "2026-06-01", "to": "2026-06-30" },
   "variable_spending": [
-    { "name": "食費",           "actual": 26910 },
-    { "name": "日用品",         "actual": 10660 },
-    { "name": "美容",           "actual": 16500 },
-    { "name": "被服費",         "actual": 0     },
-    { "name": "交通費",         "actual": 3000  },
-    { "name": "趣味・自己投資", "actual": 51998 },
-    { "name": "医療費",         "actual": 10460 },
-    { "name": "婚活費用",       "actual": 1210  },
-    { "name": "ふるさと納税",   "actual": 16000 },
-    { "name": "家賃更新料",     "actual": 53000 },
-    { "name": "サーバー代",     "actual": 13948 },
-    { "name": "転職活動費",     "actual": 0     }
+    { "name": "食費",           "actual": 0 },
+    { "name": "日用品",         "actual": 0 },
+    { "name": "美容",           "actual": 0 },
+    { "name": "被服費",         "actual": 0 },
+    { "name": "交通費",         "actual": 0 },
+    { "name": "趣味・自己投資", "actual": 0 },
+    { "name": "医療費",         "actual": 0 },
+    { "name": "婚活費用",       "actual": 0 },
+    { "name": "ふるさと納税",   "actual": 0 },
+    { "name": "家賃更新料",     "actual": 0 },
+    { "name": "サーバー代",     "actual": 0 },
+    { "name": "転職活動費",     "actual": 0 }
   ]
 }
