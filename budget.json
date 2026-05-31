@@ -19,7 +19,7 @@
     { "name": "光熱費",   "amount": 15000 },
     { "name": "通信費",   "amount": 4913  },
     { "name": "ジム",     "amount": 11000 },
-    { "name": "サブスク", "amount": 14288 }
+    { "name": "サブスク", "amount": 17488 }
   ],
   "dividends": {
     "monthly_total": 14423,
@@ -39,7 +39,8 @@
     { "name": "Amazonサプリ",              "amount": 2830, "note": "定期購入" },
     { "name": "サンドラサプリ",            "amount": 660,  "note": "定期購入" },
     { "name": "マネーフォワードクラウド",  "amount": 900,  "note": "家計管理・年払い月換算" },
-    { "name": "xサーバー",                "amount": 1392, "note": "Web・年払い月換算（2027年2月まで）" }
+    { "name": "xサーバー",                "amount": 1392, "note": "Web・年払い月換算（2027年2月まで）" },
+    { "name": "Claude Pro",               "amount": 3200, "note": "AI・USD$20/月・為替により変動" }
   ],
   "subscriptions_note": "ジム(¥11,000)は固定費に計上済み。subscriptions.xlsxがあれば自動で最新verタブを読み込みます。",
   "mf_category_map": {
