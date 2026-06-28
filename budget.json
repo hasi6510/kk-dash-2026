@@ -1,5 +1,5 @@
 {
-  "month": "2026-06",
+  "month": "2026-07",
   "variable_categories": [
     { "name": "食費",           "budget": 35000, "type": "変動費"   },
     { "name": "日用品",         "budget": 10000, "type": "変動費"   },
